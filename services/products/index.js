@@ -11,18 +11,31 @@ const typeDefs = gql`
     name: String
     price: Int
     weight: Int
+    stockData: StockData
+  }
+
+  extend type StockData @key(fields: "productUpc") {
+    productUpc: String! @external
   }
 `;
+
+function addStockDataPlaceholder(product) {
+  return {
+    ...product,
+    stockData: {productUpc: product.upc},
+  };
+}
 
 const resolvers = {
   Product: {
     __resolveReference(object) {
-      return products.find(product => product.upc === object.upc);
+      return addStockDataPlaceholder(
+        products.find(product => product.upc === object.upc));
     }
   },
   Query: {
     topProducts(_, args) {
-      return products.slice(0, args.first);
+      return products.slice(0, args.first).map(addStockDataPlaceholder);
     }
   }
 };

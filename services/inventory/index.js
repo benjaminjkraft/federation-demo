@@ -6,8 +6,12 @@ const typeDefs = gql`
     upc: String! @external
     weight: Int @external
     price: Int @external
-    inStock: Boolean
     shippingEstimate: Int @requires(fields: "price weight")
+  }
+
+  type StockData @key(fields: "productUpc") {
+    productUpc: String!
+    inStock: Boolean
   }
 `;
 
@@ -25,7 +29,15 @@ const resolvers = {
       // estimate is based on weight
       return object.weight * 0.5;
     }
-  }
+  },
+  StockData: {
+    __resolveReference(object) {
+      return {
+        ...object,
+        inStock: inventory.find(product => product.upc == object.productUpc).inStock
+      };
+    },
+  },
 };
 
 const server = new ApolloServer({

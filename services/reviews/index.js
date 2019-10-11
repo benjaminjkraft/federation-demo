@@ -17,7 +17,12 @@ const typeDefs = gql`
 
   extend type Product @key(fields: "upc") {
     upc: String! @external
-    reviews: [Review]
+    stockData: StockData @external
+    reviews: [Review] @requires(fields: "stockData { inStock }")
+  }
+
+  extend type StockData @key(fields: "productUpc") {
+    productUpc: String! @external
   }
 `;
 
@@ -41,6 +46,9 @@ const resolvers = {
   },
   Product: {
     reviews(product) {
+      if (!product.stockData || !product.stockData.inStock) {
+        return null // hide reviews for out-of-stock products
+      }
       return reviews.filter(review => review.product.upc === product.upc);
     }
   }
