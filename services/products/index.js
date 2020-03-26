@@ -11,6 +11,15 @@ const typeDefs = gql`
     name: String
     price: Int
     weight: Int
+    i: In
+  }
+
+  extend interface In @key(fields: "id") {
+    id: ID! @external
+  }
+
+  extend type A implements In @key(fields: "id") {
+    id: ID! @external
   }
 `;
 
@@ -45,7 +54,8 @@ const products = [
     upc: "1",
     name: "Table",
     price: 899,
-    weight: 100
+    weight: 100,
+    i: {__typename: "A", id: "123"}
   },
   {
     upc: "2",

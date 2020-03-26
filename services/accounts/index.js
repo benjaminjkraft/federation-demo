@@ -11,6 +11,23 @@ const typeDefs = gql`
     name: String
     username: String
   }
+
+  interface In @key(fields: "id") {
+    id: ID!
+    name: String
+  }
+
+  type A implements In @key(fields: "id") {
+    id: ID!
+    name: String
+    a: String
+  }
+
+  type B implements In @key(fields: "id") {
+    id: ID!
+    name: String
+    b: String
+  }
 `;
 
 const resolvers = {
